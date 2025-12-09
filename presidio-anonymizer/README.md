@@ -202,3 +202,21 @@ docker-compose up -d
 
 Follow the [API Spec](https://microsoft.github.io/presidio/api-docs/api-docs.html#tag/Anonymizer) for the
 Anonymizer REST API reference details
+
+
+
+## Section 3 – Factory, Operator Selection, and Strategy Pattern
+
+### How many `if/elif` branches does the factory use to select the operator?
+
+The factory does **not** use a long chain of `if` or `elif` statements to choose between specific operators such as `redact`, `replace`, or `initial`. Instead, it uses **one conditional decision** only to determine whether the requested operator belongs to the anonymizer group or the deanonymizer group. After that group is chosen, the actual operator is **not selected using conditionals at all**. Instead, the factory relies on a direct lookup mechanism. Any additional `if` statements in the factory are only used for **error handling**, such as checking whether an invalid operator name or operator type was provided. Therefore, the number of `if/elif` branches used to select a specific operator is **zero**, and only **one conditional** is used to select the operator category.
+
+
+### What exact Python data structure is used to select operators?
+
+The factory uses a **dictionary (hash map)** as the core data structure for operator selection. Operator names such as `"redact"`, `"replace"`, and `"initial"` are used as **keys**, and their corresponding operator classes are stored as **values**. These dictionaries are organized by operator type (anonymize or deanonymize). When an operator is requested, the factory retrieves the correct operator class using a **dictionary lookup by name**. This allows the selection to happen efficiently in constant time and eliminates the need for multiple condition checks.
+
+
+### How does this demonstrate the Strategy design pattern?
+
+This design demonstrates the **Strategy Pattern** because each operator (such as `Redact`, `Replace`, or `Initial`) represents a separate **strategy** that implements the same common interface. The anonymization engine does **not** know which specific operator it is using. Instead, it asks the factory to supply the correct strategy at runtime based on configuration. New behaviors can be added simply by creating a new operator class and registering it with the factory, without changing the engine’s logic. This shows the key idea of the Strategy pattern: **different algorithms (strategies) can be swapped dynamically at runtime without modifying the client code.**

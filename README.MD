@@ -16,13 +16,16 @@ to the anonymize method in AnonymizerEngine Class (line 104)
 [complete the call stack here]
 ```
 
-* How many if/elif branches are used in selecting the operator?
-*Put your answer here*
 
-* What data structure (a Python data type) exactly is used to select the operator?
-*Put your answer here*
+* How many if/elif branches are used in selecting the operator?  
+The factory does not use a chain of `if`/`elif` statements to choose between specific operators like `redact`, `replace`, or `initial`. It uses a single conditional to decide which *group* of operators to use (anonymizers vs. deanonymizers), and then relies on a dictionary lookup to select the specific operator. So the number of `if/elif` branches used to select a particular operator is effectively **zero**.
 
-* Explain how "Strategy" design pattern is reflected here.
+* What data structure (a Python data type) exactly is used to select the operator?  
+A **dictionary** is used to select the operator. Operator names are used as keys (for example `"redact"`, `"replace"`, `"initial"`), and the corresponding operator classes are stored as values in that dictionary. When an operator is needed, the factory looks it up by name in this dictionary.
+
+* Explain how "Strategy" design pattern is reflected here.  
+This code reflects the **Strategy** design pattern because each operator (`Redact`, `Replace`, `Mask`, `Initial`, etc.) is a separate strategy class that implements a common `Operator` interface. The engine and factory do not hard-code which operator to use; instead, they ask for an operator by name and receive the appropriate strategy at runtime from the factory. New behaviors can be added by defining a new operator class and registering it, without changing the engine’s control flow. This ability to swap different algorithms (strategies) behind a common interface, chosen dynamically by configuration, is exactly what the Strategy pattern describes.
+
 
 
 ---
